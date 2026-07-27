@@ -1,0 +1,320 @@
+"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import PageTransition from "@/components/PageTransition";
+import BackToTop from "@/components/BackToTop";
+
+interface FAQItem {
+  q: string;
+  a: string;
+  cat: string;
+}
+
+const faqData: FAQItem[] = [
+  {
+    q: "什么时候报到？",
+    a: "报到时间以录取通知书标注的日期为准，一般为2026年9月初。请务必按照通知书上的时间来校报到，不要提前或推迟。",
+    cat: "报到",
+  },
+  {
+    q: "报到地点在哪里？",
+    a: "报到地点为山东外贸职业学院青岛北校区（山东省青岛市李沧区虎山路街道巨峰路201号）。报到当天校内会有志愿者引导。",
+    cat: "报到",
+  },
+  {
+    q: "报到需要带什么材料？",
+    a: "必须携带：录取通知书、身份证（及复印件）、个人档案（密封完好）、农商银行卡。建议额外准备一寸蓝底照片6张以上。",
+    cat: "报到",
+  },
+  {
+    q: "可以提前到校吗？",
+    a: "建议按照录取通知书上的时间准时报到。如有特殊情况需提前到校，请提前联系学校招生办或辅导员确认是否可以安排。",
+    cat: "报到",
+  },
+  {
+    q: "宿舍怎么分？",
+    a: "宿舍由学校统一分配，一般按照专业和班级安排。女生可选择公主楼（四/六人间，上床下桌）或普通女生宿舍（六人间）。男生宿舍为七人间。具体分配结果会在开学前公布。",
+    cat: "宿舍",
+  },
+  {
+    q: "宿舍限电多少？",
+    a: "宿舍限电功率为500W。超过此功率可能触发断电保护。请勿在宿舍使用电热毯、电饭锅、电暖器等大功率电器。",
+    cat: "宿舍",
+  },
+  {
+    q: "宿舍有空调吗？",
+    a: "所有宿舍均配备空调，24小时不断电，可以放心使用。",
+    cat: "宿舍",
+  },
+  {
+    q: "宿舍是上床下桌吗？",
+    a: "公主楼为上床下桌配置（四人间/六人间）。普通女生宿舍为两个三连桌（六人间）。男生宿舍为一个三连桌（七人间）。",
+    cat: "宿舍",
+  },
+  {
+    q: "宿舍有独立卫浴吗？",
+    a: "女生公主楼卫浴位于宿舍楼内。普通女生宿舍和男生宿舍使用楼内公共卫浴。",
+    cat: "宿舍",
+  },
+  {
+    q: "军训多久？",
+    a: "军训时长预计14天左右，开学报到后进行。具体安排以学校通知为准。",
+    cat: "军训",
+  },
+  {
+    q: "军训服装怎么买？",
+    a: "军训服装开学后统一发放、统一购买。通常包括迷彩服、帽子、腰带、军训鞋等。具体费用以学校通知为准。",
+    cat: "军训",
+  },
+  {
+    q: "什么情况可以免训？",
+    a: "只有身体特殊原因（如心脏病、哮喘等）可以申请免训。需要提供医院证明，向辅导员提交书面申请，经学校审批后方可免训。",
+    cat: "军训",
+  },
+  {
+    q: "学费怎么交？",
+    a: "学校将在开学前开放线上缴费通道，支持微信、支付宝、银行卡等方式。请关注学校官方通知。",
+    cat: "学费",
+  },
+  {
+    q: "助学贷款怎么办？",
+    a: "已办理助学贷款的同学，无需提前缴纳学费及住宿费。开学报到时携带助学贷款回执单提交即可，学校将协助办理后续手续。",
+    cat: "学费",
+  },
+  {
+    q: "快递地址是什么？在哪里拿快递？",
+    a: "快递地址：山东省青岛市李沧区虎山路街道巨峰路201号 山东外贸职业学院（北校区）菜鸟驿站。所有快递统一送至菜鸟驿站，凭取件码取件。",
+    cat: "生活",
+  },
+  {
+    q: "食堂怎么样？贵不贵？",
+    a: "学校食堂覆盖南北口味，一顿饭约10-20元。热门推荐：猪肘面、麻辣烫、重庆小面、自选菜、麻辣香锅等。支持外卖配送到宿舍楼下。",
+    cat: "生活",
+  },
+  {
+    q: "外卖能送到哪里？",
+    a: "外卖可配送到宿舍楼下，部分商家支持送至宿舍楼门口。",
+    cat: "生活",
+  },
+  {
+    q: "学校附近有银行吗？",
+    a: "学校内有ATM自助取款机。附近有农商银行网点，步行可达。建议使用农商银行卡，与校园卡绑定方便。",
+    cat: "生活",
+  },
+  {
+    q: "开学需要带哪些生活用品？",
+    a: "建议携带衣物、洗漱用品、手机充电器、插排、雨伞（青岛多雨）、水杯、拖鞋、衣架等。床上用品可自带也可在学校购买。详细清单请查看「入学准备」页面。",
+    cat: "生活",
+  },
+  {
+    q: "可以自带被褥吗？",
+    a: "可以自带被褥和床上用品，也可以到校后在学校指定地点购买。学校提供的床上用品质量有保障，价格合理。",
+    cat: "生活",
+  },
+  {
+    q: "怎么联系学姐？",
+    a: "可以添加小羊学姐微信：yyang-zy06。学姐会尽力解答大家关于报到、宿舍、军训、校园生活等方面的问题。",
+    cat: "其他",
+  },
+  {
+    q: "学校有校园网吗？",
+    a: "学校覆盖校园无线网络，入学后可凭学号登录使用。具体使用方法和资费标准请关注开学后的通知。",
+    cat: "其他",
+  },
+  {
+    q: "学校就业率怎么样？",
+    a: "就业率常年95%以上，2019届高达98.84%。每年校园招聘会到场企业超1000家，提供岗位上万个。68%毕业生留在青岛工作，约80%招聘企业驻地在青岛。毕业生遍布外贸、物流、互联网等行业，专业高度对口。",
+    cat: "就业",
+  },
+  {
+    q: "什么是3+2专本贯通？",
+    a: "在山外读3年 + 在本科院校读2年 = 全日制本科文凭 + 学士学位。对接山东青年政治学院、临沂大学、枣庄学院、山东女子学院等本科院校。2026年新增电子商务专业，分数够的同学重点考虑！",
+    cat: "学费",
+  },
+  {
+    q: "专升本率高吗？",
+    a: "专升本上岸每年超1000人，升本率在全省公办专科院校中稳居第一梯队。图书馆常年满座，学习氛围浓厚，备考环境好。",
+    cat: "学费",
+  },
+  {
+    q: "学费一年多少钱？",
+    a: "省属公办院校，学费4000-6000元/年，远低于民办专科。入学即可报名自考本科，毕业可同时拿专科+本科双证。",
+    cat: "学费",
+  },
+  {
+    q: "学校有早操吗？",
+    a: "没有！山外没有早操，你不用早上6点爬起来跑操。这在山东高校里真的不多见。",
+    cat: "生活",
+  },
+  {
+    q: "宿舍门禁几点？出入自由吗？",
+    a: "门禁晚上10:30，比大多数高校更宽松。出入自由，没课就可以出校门，不用请假，周末随便安排。",
+    cat: "生活",
+  },
+  {
+    q: "学校在青岛什么位置？偏不偏？",
+    a: "学校在青岛市中心李沧核心区，不是郊区！出校门步行5-10分钟到万达广场，李村夜市公交几站即达。地铁2号线、3号线步行可达，通达青岛全部核心区域。",
+    cat: "生活",
+  },
+  {
+    q: "为什么叫公主楼？",
+    a: "7、8号楼人称「公主楼」，是全校公认条件最好的宿舍楼。四人间/六人间，正宗上床下桌，是山外最好的招生简章。具体分配以学校安排为准。",
+    cat: "宿舍",
+  },
+  {
+    q: "宿舍有独立卫浴吗？",
+    a: "目前青岛校区多数宿舍是公共卫浴，每栋楼一楼有公共浴室。有帘子有隔板，私密性OK。用APP预约，不用排队抢位。公共卫浴的好处是不用自己打扫卫生间，洗澡水压也比独卫稳定。如果你非常介意这一点，要考虑清楚哦。",
+    cat: "宿舍",
+  },
+  {
+    q: "学校办学多久了？",
+    a: "山东外贸职业学院创建于1964年，隶属山东省商务厅，办学已60余年。是山东省最早、也是唯一专门从事外经贸教育的公办高职院校，被誉为外贸界「黄埔军校」。",
+    cat: "其他",
+  },
+  {
+    q: "跨境电商专业怎么样？",
+    a: "跨境电商是山外王牌中的王牌！2012年率先开展跨境电商人才培养，比大多数高校早了近十年。建有山东省跨境电商工程技术研发中心和青岛跨境电商孵化基地，学生真刀真枪做跨境项目。教学成果获国家级教学成果奖二等奖。",
+    cat: "其他",
+  },
+  {
+    q: "学校外教多吗？",
+    a: "外语教师130余人，含8名欧盟认证同传译员（全国高职极其罕见）。常年20余名外教驻校，多为欧美母语教师。建有国内领先的「外语村」——沉浸式语言文化实践教学基地。开设英语、日语、韩语、西班牙语、法语等语种。",
+    cat: "其他",
+  },
+  {
+    q: "青岛气候怎么样？",
+    a: "青岛冬暖夏凉，夏季平均25°C，比内陆城市低5-10°C。冬季有暖气，室内穿单衣。春天樱花满城，秋天碧海蓝天。海洋性气候，空气湿润清新不干燥。在校生评价：'夏天不用空调也能睡，冬天暖气足，气候比老家舒服一万倍。'",
+    cat: "生活",
+  },
+];
+
+const categories = ["全部", "报到", "宿舍", "军训", "学费", "就业", "生活", "其他"];
+
+export default function FAQPage() {
+  const [activeCat, setActiveCat] = useState("全部");
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
+
+  const filtered = faqData.filter((item) => {
+    const matchCat = activeCat === "全部" || item.cat === activeCat;
+    const matchSearch = !search || item.q.includes(search) || item.a.includes(search);
+    return matchCat && matchSearch;
+  });
+
+  return (
+    <PageTransition>
+      <BackToTop />
+
+      <div className="px-5 pt-8 pb-2 safe-top">
+        <p className="text-xs font-medium text-[var(--text-muted)] tracking-wide">FAQ</p>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] mt-1">常见问题</h1>
+      </div>
+
+      {/* Search */}
+      <section className="px-5 mt-6 mb-4">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--text-muted)] shrink-0">
+            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="搜索问题..."
+            className="flex-1 bg-transparent outline-none text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
+          />
+        </div>
+      </section>
+
+      {/* Category tabs */}
+      <section className="px-5 mb-6">
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => { setActiveCat(cat); setOpenIndex(null); }}
+              className={`shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                activeCat === cat
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "glass text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ list */}
+      <section className="px-5 mb-8">
+        {filtered.length === 0 && (
+          <div className="text-center py-12">
+            <span className="text-4xl block mb-3">🔍</span>
+            <p className="text-sm text-[var(--text-muted)]">没有找到相关问题</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1">试试其他关键词吧</p>
+          </div>
+        )}
+
+        <div className="space-y-3">
+          {filtered.map((item, i) => {
+            const isOpen = openIndex === i;
+            return (
+              <motion.div
+                key={`${item.q}-${i}`}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.03, duration: 0.3 }}
+                className="glass rounded-2xl overflow-hidden"
+              >
+                <button
+                  onClick={() => setOpenIndex(isOpen ? null : i)}
+                  className="w-full flex items-center justify-between px-5 py-4 text-left"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span className="text-lg shrink-0">{isOpen ? "📖" : "📘"}</span>
+                    <div>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium mr-2">
+                        {item.cat}
+                      </span>
+                      <span className="text-sm font-semibold text-[var(--text-primary)]">{item.q}</span>
+                    </div>
+                  </div>
+                  <motion.svg
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    transition={{ duration: 0.25 }}
+                    width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                    className="text-[var(--text-muted)] shrink-0 ml-2"
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </motion.svg>
+                </button>
+
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-5 pb-4 pt-0">
+                        <div className="w-full h-px bg-[var(--border-color)] mb-3" />
+                        <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{item.a}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
+
+      <footer className="px-5 pb-4 text-center">
+        <p className="text-xs text-[var(--text-muted)]">没找到答案？联系小羊学姐吧 💬</p>
+      </footer>
+    </PageTransition>
+  );
+}

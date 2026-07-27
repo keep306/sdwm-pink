@@ -1,0 +1,73 @@
+"use client";
+
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { useToast } from "./Toast";
+
+interface CopyButtonProps {
+  text: string;
+  label?: string;
+  successMessage?: string;
+  className?: string;
+}
+
+export default function CopyButton({
+  text,
+  label = "复制",
+  successMessage = "已复制到剪贴板",
+  className = "",
+}: CopyButtonProps) {
+  const [copied, setCopied] = useState(false);
+  const { showToast } = useToast();
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      showToast(successMessage, "✅");
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Fallback
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopied(true);
+      showToast(successMessage, "✅");
+      setTimeout(() => setCopied(false), 1500);
+    }
+  };
+
+  return (
+    <motion.button
+      whileTap={{ scale: 0.95 }}
+      onClick={handleCopy}
+      className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${
+        copied
+          ? "bg-green-500 text-white"
+          : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800"
+      } ${className}`}
+    >
+      {copied ? (
+        <>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          已复制
+        </>
+      ) : (
+        <>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          {label}
+        </>
+      )}
+    </motion.button>
+  );
+}
